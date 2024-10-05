@@ -7,6 +7,6 @@ app.use(express.json())
 app.use(router)
 
 //Rota 
-app.listen(3000, (req, res) => {
+app.listen(3001, (req, res) => {
     console.log('Servidor ok')
 })

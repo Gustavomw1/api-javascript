@@ -41,8 +41,13 @@ const loginUser = (req, res) => {
             return res.status(500).json({ erro: 'Erro ao buscar usuário' });
         }
 
+        // Verificando se o usuário foi encontrado
+        if (result.length === 0) {
+            return res.status(404).json({ erro: 'Usuário não encontrado' });
+        }
 
         // Verificando a senha
+        const usuario = result[0];  // Acessando o primeiro resultado da consulta
         const match = await bcrypt.compare(senha, usuario.senha);
         if (match) {
             return res.status(200).json({ mensagem: 'Login bem-sucedido' });
