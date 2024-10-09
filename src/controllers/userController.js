@@ -1,5 +1,7 @@
 const db = require('../database/conexao');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken')
+const SECRET = 'tools'
 
 
 // Rota para localizar usuário
@@ -32,6 +34,18 @@ const registerUser = async (req, res) => {
 };
 
 
+// verifiy JWT
+function verifyJWT(req, res) {
+    const token = req.headers['x-access-token']
+    jwt.verify(token, SECRET, (error, result) => {
+        if(error){
+            return res.status(401).end()
+        } else{
+            req.userId = result.userId
+        }
+    })
+}
+
 // Rota para logar usuário
 const loginUser = (req, res) => {
     const { email, senha } = req.body;
@@ -50,7 +64,8 @@ const loginUser = (req, res) => {
         const usuario = result[0];  // Acessando o primeiro resultado da consulta
         const match = await bcrypt.compare(senha, usuario.senha);
         if (match) {
-            return res.status(200).json({ mensagem: 'Login bem-sucedido' });
+            const token = jwt.sign({userId: 1}, SECRET, { expiresIn: 300})
+            return res.status(200).json({ auth: true, token, mensagem: 'Login bem-sucedido' });
         } else {
             return res.status(401).json({ erro: 'Senha incorreta' });
         }
